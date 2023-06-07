@@ -20,11 +20,11 @@ class Program
 {
     static void Main()
     {
-        string csvFilePath = @"/mnt/c/Users/gtd19/" + 
+        string csvFilePath = @"/mnt/c/Users/Dell User/" + 
                             @"OneDrive - University of Canterbury/" + 
                             @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/A01/" +
                             @"I_V Diode Full wo PowComp.csv";
-        string excelFilePath = @"/mnt/c/Users/gtd19/" +
+        string excelFilePath = @"/mnt/c/Users/Dell User/" +
                                @"OneDrive - University of Canterbury/" + 
                                @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/" +
                                 @"IrOx230509_02_A01.xlsx";
@@ -39,12 +39,28 @@ class Program
                 {
                     using (ExcelPackage package = new ExcelPackage(new FileInfo(excelFilePath)))
                     {
+                        ExcelWorkbook workbook = package.Workbook;
+                        if (workbook == null)
+                        {
+                            Console.WriteLine("Workbook not found");
+                            return;
+                        }
+                        else 
+                        {
+                             Console.WriteLine("I have gone in here");
+                             foreach (ExcelWorksheet ws in workbook.Worksheets)
+                                {
+                                    Console.WriteLine("hellow");
+                                    Console.WriteLine(ws.Name);
+                                }
+                        }
                         ExcelWorksheet worksheet = package.Workbook.Worksheets["Full"];
                         if (worksheet == null)
                         {
                             Console.WriteLine("Worksheet not found!");
                             return;
                         }
+                        
                         int row = 7;
                         while (!reader.EndOfStream)
                         {
