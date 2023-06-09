@@ -35,13 +35,48 @@ class Program
         string excelFilePath = @"IrOx230509_02_A01.xlsx";
         string csvFilePath = @"I_V Diode Full wo PowComp.csv";
         
-        uploadToOneSheet (csvFilePath, excelFilePath, "Full", 7, 1);
+        //uploadToOneSheet (csvFilePath, excelFilePath, "Full", 7, 1);
+        MeasFile measFile = new MeasFile();
+        
+    }
+    class MeasFile
+    {
+        public string csvFilePath { get; set; }
+        public string csvFolderPath{get; set;}
+        public string csvFileName{get; set;}
+        public string[] measType { get; set; } // Type of measuremnt
+        public int startRow { get; set; }
+        public int startCol { get; set; }
+        public 
+        static void analyzeFileName()
+        {
+
+        }
+    }
+
+    public static Person GetPersonDetails()
+    {
+        int age = 30;
+        string name = "John Doe";
+        return new Person { Age = age, Name = name };
+    }
+
+    // Usage
+    Person person = GetPersonDetails();
+    int age = person.Age;
+    string name = person.Name;
+
+    static void uploadToMultiSheets (string[] fCsvFilePaths, string fExcelFilePath, string[] fSheetNames, int[] fStartRows, int[] fStartCols)
+    {
+        Console.WriteLine("Went in");
+        for (int i=0; i < fCsvFilePaths.Length; i++)
+        {
+            uploadToOneSheet(fCsvFilePaths[i], fExcelFilePath, fSheetNames[i], fStartRows[i], fStartRows[i]);
+        }
+        
     }
     static void uploadToOneSheet (string fCsvFilePath, string fExcelFilePath, string fSheetName, int fStartRow, int fStartCol)
     {
-        
-        
-        
         // Console.WriteLine(csvFilePath);
         // Console.WriteLine(excelFilePath);
         try
