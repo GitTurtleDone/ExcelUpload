@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using OfficeOpenXml;
+using System.Globalization;
+
+
 
 // See https://aka.ms/new-console-template for more information
 //Console.WriteLine("Hello, World! My name is Giang");
@@ -15,6 +18,216 @@ string filePath = "C:\\Users\\gtd19\\" +
 
 Console.WriteLine(filePath);
 */
+public class MeasFile
+{
+    public string CsvFilePath { get; set; }
+    public string CsvFolderPath{get; set;}
+    public string CsvFileName{get; set;}
+    public string MeasType { get; set; } // Type of measuremnt
+    public void analyzeFile() // get the file name and the folder path from the file path
+    {
+        
+        if (!string.IsNullOrEmpty(CsvFilePath))
+        {
+            if (string.IsNullOrEmpty(CsvFileName)) CsvFileName = Path.GetFileName(CsvFilePath);
+            if (string.IsNullOrEmpty(CsvFolderPath)) CsvFolderPath = Path.GetDirectoryName(CsvFilePath);
+            Console.WriteLine(CsvFileName);
+            Console.WriteLine(CsvFolderPath);
+        }
+        else
+        {
+            Console.WriteLine("File path is empty or null.");
+        }
+            
+    } 
+    public void getMeasurementType() // get the measurement type fromt the file name
+    {
+        int index = CsvFileName.IndexOf(@"[");
+        if (index != -1)
+        {
+            MeasType = CsvFileName.Substring(0, index-1);
+            Console.WriteLine(MeasType);
+        }
+        else if (CsvFileName.Contains("Stop3"))
+        {
+            MeasType = "KL For";
+        }
+        else if (CsvFileName.Contains("StopM3"))
+        {
+            MeasType = "KL Rev";
+        }
+        else if (CsvFileName.Contains("StopM500"))
+        {
+            MeasType = "Pico Rev 500";
+        }
+        else MeasType = "No Type";
+
+    }
+    
+}
+public class MeasFolder
+{
+    public string FolderPath { get; set;}
+    public string FolderName { get; set;}
+    public string DeviceName { get; set;}
+    public string DeviceType { get; set;}
+    public string[] AllFilePaths { get; set;}
+    public List<string> AllCsvFileNames { get; set;} = new List<string>();
+    public List<string> AllCsvFilePaths { get; set;} = new List<string>();
+    public List<string> AllMeasTypes { get; set;} = new List<string>();
+    public List<DateTime> AllMeasTimes { get; set;} = new List<DateTime>();
+    public List<bool> AllIsLasts { get; set;} = new List<bool>();
+    
+    public void getAllCsvFileNames()
+    {
+        AllFilePaths =  Directory.GetFiles(FolderPath); 
+        foreach (string filePath in AllFilePaths)
+        {
+            string fileName = Path.GetFileName(filePath);
+            if (fileName.Contains("csv")) 
+            {
+                //Console.WriteLine(fileName);
+                AllCsvFileNames.Add(fileName);
+                AllCsvFilePaths.Add(filePath);
+            }
+        }
+    }
+    public void getAllMeasTypes()
+    {
+        foreach (string fileName in AllCsvFileNames)
+        {
+            AllMeasTypes.Add(getMeasType(fileName));
+        }
+    }
+
+    public void getAllMeasTimes()
+    {   
+        foreach (string fileName in AllCsvFileNames)
+        {
+            AllMeasTimes.Add(getMeasTime(fileName));
+        }
+    }
+    public void getAllIsLasts()
+    {   
+        //List<int> lstIgnoredIndices = new List<int>();
+        Console.WriteLine($"Measurement number: {(AllMeasTypes.Count-1).ToString()}");
+        for (int i=0; i < AllMeasTypes.Count; i++)
+        {
+            AllIsLasts.Add(true); 
+        }
+        
+        for (int i=0; i < AllMeasTypes.Count; i++)
+        {
+            for (int j=i+1; j < AllMeasTypes.Count; j++)
+            {
+                if (AllMeasTypes[j] == AllMeasTypes[i])
+                {
+                    //lstIgnoredIndices.Add(j);
+                    if (AllMeasTimes[j] < AllMeasTimes[i])
+                    {
+                        AllIsLasts[j] = false;
+                    }
+                    else
+                    {
+                        AllIsLasts[i] = false;
+                    }
+
+                }
+            } 
+        }
+        for (int i=0; i < AllMeasTypes.Count; i++)
+        {
+            Console.WriteLine(AllIsLasts[i]);
+        }
+
+        
+    }
+    private string getMeasType(string csvFileName) // get the measurement type for the file name
+    {
+        string measType;
+        int index = csvFileName.IndexOf(@"[");
+        if (index != -1)
+        {
+            measType = csvFileName.Substring(0, index-1);
+            Console.WriteLine(measType);
+        }
+        else if (csvFileName.Contains("Stop3"))
+        {
+            measType = "KL For";
+        }
+        else if (csvFileName.Contains("StopM3"))
+        {
+            measType = "KL Rev";
+        }
+        else if (csvFileName.Contains("StopM500"))
+        {
+            measType = "Pico Rev 500";
+        }
+        else measType = "No Type";
+
+        return measType;
+
+    }
+    private DateTime getMeasTime(string csvFileName)
+    {
+        string strMeasTime;
+        DateTime measTime = DateTime.MinValue;
+        string dateTimeFormat = "dd/MM/yyyy HH:mm:ss";
+        int indexCloseBracket = csvFileName.IndexOf(@"]");
+        int indexSemicolon = csvFileName.IndexOf(@";");
+        if ( indexCloseBracket!= -1)
+        {
+            strMeasTime = csvFileName.Substring(indexSemicolon+2,indexCloseBracket-indexSemicolon-2);
+            Console.WriteLine(strMeasTime);
+        }
+        else strMeasTime = "";
+        try 
+        {
+            
+            string ap = "a";
+            string strHour;
+            int firstDotIndex = strMeasTime.IndexOf(@".");
+            ap = strMeasTime.Substring(firstDotIndex-1,1);
+            strHour = strMeasTime.Substring(firstDotIndex-10,2);
+            if (ap=="p" && strHour != "12")
+            {
+                strHour = (int.Parse(strHour) + 12).ToString();
+                if (strMeasTime[firstDotIndex-10] == ' ')
+                {
+                    strMeasTime = strMeasTime.Remove(firstDotIndex-9,1);
+                    strMeasTime = strMeasTime.Insert(firstDotIndex-9, strHour);
+                }
+                else
+                {
+                    strMeasTime = strMeasTime.Remove(firstDotIndex-10,2);
+                    strMeasTime = strMeasTime.Insert(firstDotIndex-10, strHour);
+                }
+            }
+            strMeasTime = strMeasTime.Substring(0,strMeasTime.Length-5);
+            int strMeasTimeLength = strMeasTime.Length;
+            strMeasTime = strMeasTime.Remove(strMeasTimeLength-3,1);
+            strMeasTime = strMeasTime.Insert(strMeasTimeLength-3,":");
+            strMeasTime = strMeasTime.Remove(strMeasTimeLength-6,1);
+            strMeasTime = strMeasTime.Insert(strMeasTimeLength-6,":");
+            strMeasTime = strMeasTime.Replace("_", "/");
+
+            Console.WriteLine($"ap: {ap} hour: {strHour} measureTime: {strMeasTime}");
+            
+            //Console.WriteLine(strMeasTime);
+            //measTime=DateTime.Parse(strMeasTime);
+            measTime = DateTime.ParseExact(strMeasTime,dateTimeFormat, CultureInfo.InvariantCulture);
+            //ParseExact(strMeasTime, dateTimeFormat);
+        }
+        catch (FormatException ex)
+        {
+            
+            Console.WriteLine($"Invalid date format: {ex.Message}");
+        }
+        return measTime;    
+    }
+    
+}
+
 
 class Program
 {
@@ -22,10 +235,7 @@ class Program
     {
         /*
         
-        string csvFilePath = @"/mnt/c/Users/Dell User/" + 
-                            @"OneDrive - University of Canterbury/" + 
-                            @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/A01/" +
-                            @"I_V Diode Full wo PowComp.csv";
+        string csvFilePath = @"I_V Diode Full wo PowComp.csv";
         string excelFilePath = @"/mnt/c/Users/Dell User/" +
                                @"OneDrive - University of Canterbury/" + 
                                @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/" +
@@ -33,27 +243,32 @@ class Program
         
         */
         string excelFilePath = @"IrOx230509_02_A01.xlsx";
-        string csvFilePath = @"I_V Diode Full wo PowComp.csv";
+        string csvFilePath = @"../230512_Fab230504to0607/230519_Fab230509/Dev02/" +
+                            @"I_V Diode Full wo PowComp [02 A01(2) ; 19_05_2023 1_41_45 p.m.].csv";
+        
+        
         
         //uploadToOneSheet (csvFilePath, excelFilePath, "Full", 7, 1);
         MeasFile measFile = new MeasFile();
+        MeasFolder measFolder = new MeasFolder();
+        
+        measFile.CsvFilePath = csvFilePath;
+        measFile.analyzeFile();
+        measFolder.FolderPath = measFile.CsvFolderPath;
+        measFolder.getAllCsvFileNames();
+        measFolder.getAllMeasTimes();
+        measFolder.getAllMeasTypes();
+        measFolder.getAllIsLasts();
+        // DateTime currentDateTime = DateTime.Now;
+        // string formattedDateTime = currentDateTime.ToString();  // Format based on system settings
+        // Console.WriteLine(formattedDateTime);
+
+        
+        //Console.WriteLine($"Here is the folder path: {measFile.CsvFolderPath} ");
         
     }
-    class MeasFile
-    {
-        public string csvFilePath { get; set; }
-        public string csvFolderPath{get; set;}
-        public string csvFileName{get; set;}
-        public string[] measType { get; set; } // Type of measuremnt
-        public int startRow { get; set; }
-        public int startCol { get; set; }
-        public 
-        static void analyzeFileName()
-        {
-
-        }
-    }
-
+    
+    /*
     public static Person GetPersonDetails()
     {
         int age = 30;
@@ -65,7 +280,7 @@ class Program
     Person person = GetPersonDetails();
     int age = person.Age;
     string name = person.Name;
-
+    */
     static void uploadToMultiSheets (string[] fCsvFilePaths, string fExcelFilePath, string[] fSheetNames, int[] fStartRows, int[] fStartCols)
     {
         Console.WriteLine("Went in");
@@ -79,6 +294,8 @@ class Program
     {
         // Console.WriteLine(csvFilePath);
         // Console.WriteLine(excelFilePath);
+        // fCsvFilePath = $"\"{fCsvFilePath}\"";
+        // fExcelFilePath = $"\"{fExcelFilePath}\"";
         try
         {
             // Read the CSV file

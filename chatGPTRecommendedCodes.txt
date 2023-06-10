@@ -1,0 +1,59 @@
+using System;
+using System.IO;
+using OfficeOpenXml;
+
+class Program
+{
+    static void Main()
+    {
+        string csvFilePath = "path/to/your/file.csv";
+        string excelFilePath = "path/to/your/output.xlsx";
+        string worksheetName = "Sheet1"; // Name of the existing worksheet
+
+        try
+        {
+            // Read the CSV file
+            using (StreamReader reader = new StreamReader(csvFilePath))
+            {
+                using (ExcelPackage package = new ExcelPackage(new FileInfo(excelFilePath)))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[worksheetName];
+
+                    if (worksheet == null)
+                    {
+                        Console.WriteLine("Worksheet not found!");
+                        return;
+                    }
+
+                    int row = worksheet.Dimension.End.Row + 1; // Start from the next row
+
+                    while (!reader.EndOfStream)
+                    {
+                        string line = reader.ReadLine();
+                        string[] data = line.Split(',');
+
+                        for (int col = 0; col < data.Length; col++)
+                        {
+                            worksheet.Cells[row, col + 1].Value = data[col];
+                        }
+
+                        row++;
+                    }
+
+                    // Save the Excel file
+                    package.Save();
+                }
+            }
+
+            Console.WriteLine("Data successfully uploaded to Excel.");
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("CSV file not found!");
+        }
+        catch (IOException)
+        {
+            Console.WriteLine("An error occurred while reading or writing the file!");
+        }
+    }
+}
