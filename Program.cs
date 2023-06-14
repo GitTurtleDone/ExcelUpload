@@ -18,6 +18,154 @@ string filePath = "C:\\Users\\gtd19\\" +
 
 Console.WriteLine(filePath);
 */
+
+class Program
+{
+    static void Main()
+    {
+        /*
+        
+        string csvFilePath = @"I_V Diode Full wo PowComp.csv";
+        string excelFilePath = @"/mnt/c/Users/Dell User/" +
+                               @"OneDrive - University of Canterbury/" + 
+                               @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/" +
+                                @"IrOx230509_02_A01.xlsx";
+        
+        */
+        string excelFilePath = @"IrOx230509_02_A01.xlsx";
+        string csvFilePath = @"../230512_Fab230504to0607/230519_Fab230509/Dev02/A01/" +
+                            @"I_V Diode Full wo PowComp [02 A01(2) ; 19_05_2023 1_41_45 p.m.].csv";
+        
+        
+        
+        //uploadToOneSheet (csvFilePath, excelFilePath, "Full", 7, 1);
+        MeasFile measFile = new MeasFile();
+        SBDFolder SBDFolder = new SBDFolder();
+        
+        measFile.CsvFilePath = csvFilePath;
+        measFile.analyzeFile();
+        SBDFolder.FolderPath = measFile.CsvFolderPath;
+        SBDFolder.getAllCsvFileNames();
+        SBDFolder.getAllMeasTimes();
+        SBDFolder.getAllMeasTypes();
+        SBDFolder.getAllIsLasts();
+        SBDFolder.getSBDID();
+        SBDFolder.getSBDType();
+        SBDFolder.getSamplID();
+        SBDFolder.createWorkbook();
+        // DateTime currentDateTime = DateTime.Now;
+        // string formattedDateTime = currentDateTime.ToString();  // Format based on system settings
+        // Console.WriteLine(formattedDateTime);
+
+        
+        //Console.WriteLine($"Here is the folder path: {measFile.CsvFolderPath} ");
+        
+    }
+    
+    /*
+    public static Person GetPersonDetails()
+    {
+        int age = 30;
+        string name = "John Doe";
+        return new Person { Age = age, Name = name };
+    }
+
+    // Usage
+    Person person = GetPersonDetails();
+    int age = person.Age;
+    string name = person.Name;
+    */
+    static void uploadToMultiSheets (string[] fCsvFilePaths, string fExcelFilePath, string[] fSheetNames, int[] fStartRows, int[] fStartCols)
+    {
+        Console.WriteLine("Went in");
+        for (int i=0; i < fCsvFilePaths.Length; i++)
+        {
+            uploadToOneSheet(fCsvFilePaths[i], fExcelFilePath, fSheetNames[i], fStartRows[i], fStartRows[i]);
+        }
+        
+    }
+    static void uploadToOneSheet (string fCsvFilePath, string fExcelFilePath, string fSheetName, int fStartRow, int fStartCol)
+    {
+        // Console.WriteLine(csvFilePath);
+        // Console.WriteLine(excelFilePath);
+        // fCsvFilePath = $"\"{fCsvFilePath}\"";
+        // fExcelFilePath = $"\"{fExcelFilePath}\"";
+        try
+        {
+            // Read the CSV file
+            using (StreamReader reader = new StreamReader(fCsvFilePath))
+            {
+                try
+                {
+                    using (ExcelPackage package = new ExcelPackage(new FileInfo(fExcelFilePath)))
+                    {
+                        /*
+                        ExcelWorkbook workbook = package.Workbook;
+                        if (workbook == null)
+                        {
+                            Console.WriteLine("Workbook not found");
+                            return;
+                        }
+                        else 
+                        {
+                            Console.WriteLine("I have gone in here");
+                            var worksheets = package.Workbook.Worksheets.Select(x => x.Name);
+                            //foreach (var sheet in worksheets) Console.WriteLine(sheet);
+                            foreach (var ws in worksheets)
+                                {
+                                    Console.WriteLine("hellow");
+                                    Console.WriteLine(ws);
+                                }
+                        }
+                        */
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[fSheetName];
+                        if (worksheet == null)
+                        {
+                            Console.WriteLine("Worksheet not found!");
+                            return;
+                        }
+                        int row = fStartRow;
+                        while (!reader.EndOfStream)
+                        {
+                            string line = reader.ReadLine();
+                            string[] data = line.Split(',');
+
+                            for (int col = 0; col < data.Length; col++)
+                            {
+                                worksheet.Cells[row, col + fStartCol].Value = data[col];
+                            }
+
+                            row++;
+                        }
+
+                        // Save the Excel file
+                        FileInfo excelFile = new FileInfo(fExcelFilePath);
+                        package.SaveAs(excelFile);
+                    }
+                }
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine("Excel file not found");
+                }
+                catch (IOException)
+                {
+                    Console.WriteLine("An error occurred while reading or writing the excel file");
+                }
+            }
+
+            Console.WriteLine("Data successfully imported to Excel.");
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("CSV file not found!");
+        }
+        catch (IOException)
+        {
+            Console.WriteLine("An error occurred while reading or writing the csv file!");
+        }
+    
+    }
+}
 public class MeasFile
 {
     public string CsvFilePath { get; set; }
@@ -65,19 +213,36 @@ public class MeasFile
     }
     
 }
-public class MeasFolder
+public class SBDFolder
 {
     public string FolderPath { get; set;}
-    public string FolderName { get; set;}
-    public string DeviceName { get; set;}
-    public string DeviceType { get; set;}
+    public string SampleID { get; set;}
+    public string SBDID { get; set;}
+    public string SBDType { get; set;}
     public string[] AllFilePaths { get; set;}
     public List<string> AllCsvFileNames { get; set;} = new List<string>();
     public List<string> AllCsvFilePaths { get; set;} = new List<string>();
     public List<string> AllMeasTypes { get; set;} = new List<string>();
     public List<DateTime> AllMeasTimes { get; set;} = new List<DateTime>();
     public List<bool> AllIsLasts { get; set;} = new List<bool>();
+    public ExcelWorkbook Workbook;
+    public string WorkbookPath { get; set; }
     
+    public void getSamplID()
+    {
+        SampleID = FolderPath.Substring(FolderPath.LastIndexOf("_")+1, FolderPath.LastIndexOf("/")-FolderPath.LastIndexOf("_")-1).Replace("/","_");
+        //Console.WriteLine(SampleID);
+    }
+    public void getSBDID()
+    {
+        SBDID = FolderPath.Substring(FolderPath.Length-3);
+        //Console.WriteLine(SBDID);
+    }
+    public void getSBDType()
+    {
+        SBDType = FolderPath.Substring(FolderPath.Length-3,1);
+        Console.WriteLine(SBDType);
+    }
     public void getAllCsvFileNames()
     {
         AllFilePaths =  Directory.GetFiles(FolderPath); 
@@ -225,151 +390,46 @@ public class MeasFolder
         }
         return measTime;    
     }
-    
-}
-
-
-class Program
-{
-    static void Main()
+    public void createWorkbook()
     {
-        /*
-        
-        string csvFilePath = @"I_V Diode Full wo PowComp.csv";
-        string excelFilePath = @"/mnt/c/Users/Dell User/" +
-                               @"OneDrive - University of Canterbury/" + 
-                               @"NZ2208/NghienCuu/SemSem/Projects/betaGa2O3MESFETs/230512_Fab230504to0607/230519_Fab230509/Dev02/" +
-                                @"IrOx230509_02_A01.xlsx";
-        
-        */
-        string excelFilePath = @"IrOx230509_02_A01.xlsx";
-        string csvFilePath = @"../230512_Fab230504to0607/230519_Fab230509/Dev02/" +
-                            @"I_V Diode Full wo PowComp [02 A01(2) ; 19_05_2023 1_41_45 p.m.].csv";
-        
-        
-        
-        //uploadToOneSheet (csvFilePath, excelFilePath, "Full", 7, 1);
-        MeasFile measFile = new MeasFile();
-        MeasFolder measFolder = new MeasFolder();
-        
-        measFile.CsvFilePath = csvFilePath;
-        measFile.analyzeFile();
-        measFolder.FolderPath = measFile.CsvFolderPath;
-        measFolder.getAllCsvFileNames();
-        measFolder.getAllMeasTimes();
-        measFolder.getAllMeasTypes();
-        measFolder.getAllIsLasts();
-        // DateTime currentDateTime = DateTime.Now;
-        // string formattedDateTime = currentDateTime.ToString();  // Format based on system settings
-        // Console.WriteLine(formattedDateTime);
+        string[] files = Directory.GetFiles(FolderPath);
 
-        
-        //Console.WriteLine($"Here is the folder path: {measFile.CsvFolderPath} ");
-        
-    }
-    
-    /*
-    public static Person GetPersonDetails()
-    {
-        int age = 30;
-        string name = "John Doe";
-        return new Person { Age = age, Name = name };
-    }
-
-    // Usage
-    Person person = GetPersonDetails();
-    int age = person.Age;
-    string name = person.Name;
-    */
-    static void uploadToMultiSheets (string[] fCsvFilePaths, string fExcelFilePath, string[] fSheetNames, int[] fStartRows, int[] fStartCols)
-    {
-        Console.WriteLine("Went in");
-        for (int i=0; i < fCsvFilePaths.Length; i++)
+        foreach (string file in files)
         {
-            uploadToOneSheet(fCsvFilePaths[i], fExcelFilePath, fSheetNames[i], fStartRows[i], fStartRows[i]);
-        }
-        
-    }
-    static void uploadToOneSheet (string fCsvFilePath, string fExcelFilePath, string fSheetName, int fStartRow, int fStartCol)
-    {
-        // Console.WriteLine(csvFilePath);
-        // Console.WriteLine(excelFilePath);
-        // fCsvFilePath = $"\"{fCsvFilePath}\"";
-        // fExcelFilePath = $"\"{fExcelFilePath}\"";
-        try
-        {
-            // Read the CSV file
-            using (StreamReader reader = new StreamReader(fCsvFilePath))
+            string extension = Path.GetExtension(file);
+
+            if (extension == ".xlsx" || extension == ".xls")
             {
-                try
-                {
-                    using (ExcelPackage package = new ExcelPackage(new FileInfo(fExcelFilePath)))
-                    {
-                        /*
-                        ExcelWorkbook workbook = package.Workbook;
-                        if (workbook == null)
-                        {
-                            Console.WriteLine("Workbook not found");
-                            return;
-                        }
-                        else 
-                        {
-                            Console.WriteLine("I have gone in here");
-                            var worksheets = package.Workbook.Worksheets.Select(x => x.Name);
-                            //foreach (var sheet in worksheets) Console.WriteLine(sheet);
-                            foreach (var ws in worksheets)
-                                {
-                                    Console.WriteLine("hellow");
-                                    Console.WriteLine(ws);
-                                }
-                        }
-                        */
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[fSheetName];
-                        if (worksheet == null)
-                        {
-                            Console.WriteLine("Worksheet not found!");
-                            return;
-                        }
-                        int row = fStartRow;
-                        while (!reader.EndOfStream)
-                        {
-                            string line = reader.ReadLine();
-                            string[] data = line.Split(',');
+                WorkbookPath = file;
+                break;
+            }
+        }
 
-                            for (int col = 0; col < data.Length; col++)
-                            {
-                                worksheet.Cells[row, col + fStartCol].Value = data[col];
-                            }
-
-                            row++;
-                        }
-
-                        // Save the Excel file
-                        FileInfo excelFile = new FileInfo(fExcelFilePath);
-                        package.SaveAs(excelFile);
-                    }
-                }
-                catch (FileNotFoundException)
+        if (WorkbookPath == null)
+        {
+            // Workbook doesn't exist, create one from the template
+            string templatePath = "../SBDExcelTemplates";  // Path to the template file
+            
+            string[] templateFiles = Directory.GetFiles(templatePath);
+            foreach (string filePath in templateFiles)
+            {
+                if (SBDType == filePath.Substring(filePath.Length -8, 1))
                 {
-                    Console.WriteLine("Excel file not found");
-                }
-                catch (IOException)
-                {
-                    Console.WriteLine("An error occurred while reading or writing the excel file");
+                    templatePath = filePath;
+                    Console.WriteLine(templatePath);
                 }
             }
 
-            Console.WriteLine("Data successfully imported to Excel.");
+            // Copy the template to the folder
+            string workbookID = SampleID + "_" + SBDID + ".xlsx";
+            WorkbookPath = Path.Combine(FolderPath, workbookID);
+            File.Copy(templatePath, WorkbookPath);
+            
         }
-        catch (FileNotFoundException)
-        {
-            Console.WriteLine("CSV file not found!");
-        }
-        catch (IOException)
-        {
-            Console.WriteLine("An error occurred while reading or writing the csv file!");
-        }
-    
     }
+    
 }
+
+
+
 
