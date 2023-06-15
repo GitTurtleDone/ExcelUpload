@@ -58,7 +58,7 @@ class Program
         SBDFolder.Upload();        // DateTime currentDateTime = DateTime.Now;
         // string formattedDateTime = currentDateTime.ToString();  // Format based on system settings
         // Console.WriteLine(formattedDateTime);
-
+    
         
         //Console.WriteLine($"Here is the folder path: {measFile.CsvFolderPath} ");
         
@@ -77,7 +77,7 @@ class Program
     int age = person.Age;
     string name = person.Name;
     */
-    
+
 }
 public class MeasFile
 {
@@ -142,7 +142,7 @@ public class SBDFolder
     public List<bool> AllIsLasts { get; set;} = new List<bool>();
     public List<(string, string, int, int)> AllUploadDetails { get; set;} = new List<(string, string, int, int)>();
     public List<(string, string, int, int)> UploadDetailTemplates { get; set;} = new List<(string, string, int, int)>();
-    public ExcelPackage Workbook;
+    //public ExcelPackage Workbook;
     
     
     public void getSamplID()
@@ -263,48 +263,48 @@ public class SBDFolder
         {
             strMeasTime = csvFileName.Substring(indexSemicolon+2,indexCloseBracket-indexSemicolon-2);
             Console.WriteLine(strMeasTime);
-                try 
+        try 
+        {
+            
+            string ap = "a";
+            string strHour;
+            int firstDotIndex = strMeasTime.IndexOf(@".");
+            ap = strMeasTime.Substring(firstDotIndex-1,1);
+            strHour = strMeasTime.Substring(firstDotIndex-10,2);
+            if (ap=="p" && strHour != "12")
             {
-                
-                string ap = "a";
-                string strHour;
-                int firstDotIndex = strMeasTime.IndexOf(@".");
-                ap = strMeasTime.Substring(firstDotIndex-1,1);
-                strHour = strMeasTime.Substring(firstDotIndex-10,2);
-                if (ap=="p" && strHour != "12")
+                strHour = (int.Parse(strHour) + 12).ToString();
+                if (strMeasTime[firstDotIndex-10] == ' ')
                 {
-                    strHour = (int.Parse(strHour) + 12).ToString();
-                    if (strMeasTime[firstDotIndex-10] == ' ')
-                    {
-                        strMeasTime = strMeasTime.Remove(firstDotIndex-9,1);
-                        strMeasTime = strMeasTime.Insert(firstDotIndex-9, strHour);
-                    }
-                    else
-                    {
-                        strMeasTime = strMeasTime.Remove(firstDotIndex-10,2);
-                        strMeasTime = strMeasTime.Insert(firstDotIndex-10, strHour);
-                    }
+                    strMeasTime = strMeasTime.Remove(firstDotIndex-9,1);
+                    strMeasTime = strMeasTime.Insert(firstDotIndex-9, strHour);
                 }
-                strMeasTime = strMeasTime.Substring(0,strMeasTime.Length-5);
-                int strMeasTimeLength = strMeasTime.Length;
-                strMeasTime = strMeasTime.Remove(strMeasTimeLength-3,1);
-                strMeasTime = strMeasTime.Insert(strMeasTimeLength-3,":");
-                strMeasTime = strMeasTime.Remove(strMeasTimeLength-6,1);
-                strMeasTime = strMeasTime.Insert(strMeasTimeLength-6,":");
-                strMeasTime = strMeasTime.Replace("_", "/");
+                else
+                {
+                    strMeasTime = strMeasTime.Remove(firstDotIndex-10,2);
+                    strMeasTime = strMeasTime.Insert(firstDotIndex-10, strHour);
+                }
+            }
+            strMeasTime = strMeasTime.Substring(0,strMeasTime.Length-5);
+            int strMeasTimeLength = strMeasTime.Length;
+            strMeasTime = strMeasTime.Remove(strMeasTimeLength-3,1);
+            strMeasTime = strMeasTime.Insert(strMeasTimeLength-3,":");
+            strMeasTime = strMeasTime.Remove(strMeasTimeLength-6,1);
+            strMeasTime = strMeasTime.Insert(strMeasTimeLength-6,":");
+            strMeasTime = strMeasTime.Replace("_", "/");
 
                 //Console.WriteLine($"ap: {ap} hour: {strHour} measureTime: {strMeasTime}");
-                
-                //Console.WriteLine(strMeasTime);
-                //measTime=DateTime.Parse(strMeasTime);
-                measTime = DateTime.ParseExact(strMeasTime,dateTimeFormat, CultureInfo.InvariantCulture);
-                //ParseExact(strMeasTime, dateTimeFormat);
-            }
-            catch (FormatException ex)
-            {
-                
-                Console.WriteLine($"Invalid date format: {ex.Message}");
-            }
+            
+            //Console.WriteLine(strMeasTime);
+            //measTime=DateTime.Parse(strMeasTime);
+            measTime = DateTime.ParseExact(strMeasTime,dateTimeFormat, CultureInfo.InvariantCulture);
+            //ParseExact(strMeasTime, dateTimeFormat);
+        }
+        catch (FormatException ex)
+        {
+            
+            Console.WriteLine($"Invalid date format: {ex.Message}");
+        }
         }
         else 
         {
@@ -347,7 +347,7 @@ public class SBDFolder
             string workbookID = SampleID + "_" + SBDID + ".xlsx";
             WorkbookPath = Path.Combine(FolderPath, workbookID);
             File.Copy(templatePath, WorkbookPath);
-            Workbook = new ExcelPackage(new FileInfo(WorkbookPath));
+            //Workbook = new ExcelPackage(new FileInfo(WorkbookPath));
             
         }
         
@@ -415,7 +415,7 @@ public class SBDFolder
                 {
                     Console.WriteLine("An error occurred while reading or writing the excel file");
                 }
-            }
+        }
     }
     public void uploadToMultiSheets (string fExcelFilePath, string[] fCsvFilePaths,  string[] fSheetNames, int[] fStartRows, int[] fStartCols)
     {
@@ -424,8 +424,8 @@ public class SBDFolder
         {
             uploadToOneSheet(fExcelFilePath, fCsvFilePaths[i],  fSheetNames[i], fStartRows[i], fStartRows[i]);
         }
-        
-    }
+    
+}
     public void uploadToOneSheet (string fExcelFilePath, string fCsvFilePath, string fSheetName, int fStartRow, int fStartCol)
     {
         // Console.WriteLine(csvFilePath);
@@ -460,6 +460,7 @@ public class SBDFolder
                                 }
                         }
                         */
+                        package.Workbook.CalcMode = ExcelCalcMode.Manual;
                         ExcelWorksheet worksheet = package.Workbook.Worksheets[fSheetName];
                         if (worksheet == null)
                         {
@@ -474,15 +475,25 @@ public class SBDFolder
 
                             for (int col = 0; col < data.Length; col++)
                             {
-                                worksheet.Cells[row, col + fStartCol].Value = data[col];
+                                bool success = double.TryParse(data[col], out double result);
+                                if (success)
+                                {
+                                    worksheet.Cells[row, col + fStartCol].Value = result;
+                                }
+                                else
+                                {
+                                    worksheet.Cells[row, col + fStartCol].Value = data[col];
+                                }
+                                
                             }
 
                             row++;
                         }
 
                         // Save the Excel file
-                        FileInfo excelFile = new FileInfo(fExcelFilePath);
-                        package.SaveAs(excelFile);
+                        //FileInfo excelFile = new FileInfo(fExcelFilePath);
+                        package.Workbook.CalcMode = ExcelCalcMode.Automatic;
+                        package.Save();
                     }
                 }
                 catch (FileNotFoundException)
