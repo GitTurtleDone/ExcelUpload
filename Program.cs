@@ -35,16 +35,16 @@ class Program
         SBDFolder.FolderPath = measFile.CsvFolderPath;
         SBDFolder.processSBDFolder();        
         */
-        devFolder.FolderPath = @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/";
+        devFolder.FolderPath = @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/";
         devFolder.getAllSubFolderPaths();
         devFolder.getSampleID();
         devFolder.getAllSubFolderNames();
         devFolder.getAllSBDFolders();
-        devFolder.getAllRev500Dones();
         devFolder.getLogFilePath();
         devFolder.getMemoFilePath();
         devFolder.memoWrite();
-        devFolder.processAllSBDFolders();        
+        devFolder.processAllSBDFolders();   
+        devFolder.getAllRev500Dones();     
     }
 
 }
@@ -452,6 +452,12 @@ public class SBDFolder
     {
         try
         {
+            ExcelPackage package = new ExcelPackage (new FileInfo(WorkbookPath));
+            package.Workbook.CalcMode = ExcelCalcMode.Manual;
+            ExcelWorksheet worksheet = package.Workbook.Worksheets["Summary"];
+            worksheet.Cells[5,2].Value = SBDID;
+            package.Save();
+
             for (int i=0; i < AllIsLasts.Count; i++)
             {
                 if ((AllIsLasts[i]) && (AllMeasTypes[i] != "No Type"))
