@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System.Globalization;
+
 
 
 
@@ -24,29 +26,243 @@ class Program
     static void Main()
     {
         
-        string csvFilePath = @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/A01/" +
-                            @"I_V Diode Full wo PowComp [02 A01(2) ; 19_05_2023 1_41_45 p.m.].csv";
-        MeasFile measFile = new MeasFile();
-        SBDFolder SBDFolder = new SBDFolder();
-        DeviceFolder devFolder = new DeviceFolder();
+        ComparisonFolder comparisonFolder = new ComparisonFolder();
+        //string[] comparisonFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
+        //comparisonFolder.ComparedFolderPaths = comparisonFolderPaths;
+        comparisonFolder.ComparedFolderPaths = new string[] {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
+                                                                @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
+                                                                    @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
+        comparisonFolder.TemplateFolderPath = @"../ComparisonExcelTemplates";
+        comparisonFolder.FolderPath = @"../IrOxOASRecVsNonRec";
+        comparisonFolder.SBDType = @"E";
+        comparisonFolder.createWorkbook();
+        comparisonFolder.getAllDeviceFolders();
+        //comparisonFolder.UploadMultipleSheets(@"../E_500um.csv");
         /*
+        comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
+                                         (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
+        */
+        
+        
+    
+    
+        /*
+        string csvFilePath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05" +
+                            @"I_V Diode For Full After Rev500 wo PowComp [07 E5(4) ; 14_04_2023 4_49_12 p.m.].csv";
+        MeasFile measFile = new MeasFile();
+
+        SBDFolder SBDFolder = new SBDFolder();
+        SBDFolder.FolderPath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/F03";
+        SBDFolder.getAllCsvFileNames();
+        SBDFolder.processSBDFolder();
+        
+        //DeviceFolder devFolder = new DeviceFolder();     
         measFile.CsvFilePath = csvFilePath;
         measFile.analyzeFile();
-        SBDFolder.FolderPath = measFile.CsvFolderPath;
-        SBDFolder.processSBDFolder();        
+        
+        //string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/"};
+        string[] arrDevFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
+        for (int i = 0; i < arrDevFolderPaths.Length; i++)
+        {
+            DeviceFolder devFolder = new DeviceFolder();
+            devFolder.FolderPath = arrDevFolderPaths[i];
+            devFolder.processDeviceFolder();
+        }
+        
+
         */
-        devFolder.FolderPath = @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/";
-        devFolder.getAllSubFolderPaths();
-        devFolder.getSampleID();
-        devFolder.getAllSubFolderNames();
-        devFolder.getAllSBDFolders();
-        devFolder.getLogFilePath();
-        devFolder.getMemoFilePath();
-        devFolder.memoWrite();
-        devFolder.processAllSBDFolders();   
-        devFolder.getAllRev500Dones();     
+        
+        
+          
     }
 
+}
+
+public class ComparisonFolder
+{
+    public string FolderPath {get; set;}
+    public string[] ComparedFolderPaths { get; set;}
+    public string TemplateFolderPath {get; set;}
+    public string TemplatePath {get; set;}
+    public string SBDType {get; set;}
+    public string ComparisonUploadDetailsTemplatePath{get; set;}
+    public List<string> ComparedWorkbookPaths {get; set;} = new List<string>();
+    public List<DeviceFolder> DeviceFolders {get; set;} = new List<DeviceFolder>();
+
+    public void getAllDeviceFolders()
+    {
+        if (ComparedFolderPaths.Length == 0)
+        {
+            Console.WriteLine("Please assign the paths to the ComparedFolderPaths");
+        }
+        else
+        {
+            if (DeviceFolders.Count == 0)
+            {
+                for (int i = 0; i < ComparedFolderPaths.Length; i++)
+                {
+                    DeviceFolder deviceFolder = new DeviceFolder();
+                    deviceFolder.FolderPath = ComparedFolderPaths[i];
+                    deviceFolder.getAllSubFolderPaths();
+                    deviceFolder.getAllSubFolderNames();
+                    deviceFolder.getAllRev500Dones();
+                    Console.WriteLine ($"{ComparedFolderPaths[i]} has {deviceFolder.AllRev500Dones.Count} subfolders ");
+                    DeviceFolders.Add(deviceFolder);
+                }
+            }    
+                
+                
+        }
+    }
+    public void FillUploadDetails()
+    {
+        if (ComparedFolderPaths.Length != 0)
+        {
+            for (int i = 0; i < ComparedFolderPaths.Length; i++)
+            {
+                DeviceFolder deviceFolder = new DeviceFolder();
+
+            }
+        }
+        else
+        {
+            Console.WriteLine("Please assign all device folder paths");
+        }
+    }
+    public void createWorkbook()
+    {    
+        string[] templateFiles = Directory.GetFiles(TemplateFolderPath);
+        foreach (string filePath in templateFiles)
+        {
+            if (SBDType == filePath.Substring(filePath.Length - 12, 1))
+            {
+                // Copy the template to the folder
+                File.Copy(filePath, Path.Combine(FolderPath, Path.GetFileName(filePath)), true);
+                ComparedWorkbookPaths.Add(Path.Combine(FolderPath, Path.GetFileName(filePath)));
+                //Console.WriteLine(templatePath);
+            }
+        }
+    }
+    public void UploadMultipleSheets(string ComparisonUploadDetailsTemplatePath)
+    {
+    //
+        //ExcelPackage compUploadDetPack = new ExcelPackage(new FileInfo(ComparisonUploadDetailsTemplatePath));
+        List<(string, string, int, int, int, int)> sources = new List<(string, string, int, int, int, int)>();
+        List <(string, string, int, int, int, int)> destinations = new List<(string, string, int, int, int, int)>();
+
+        try
+        {
+            // Read the CSV file
+            using (StreamReader reader = new StreamReader(ComparisonUploadDetailsTemplatePath))
+            {
+                try
+                {
+                    int row = 0;
+                    
+                    while (!reader.EndOfStream)
+                    {
+                        string line = reader.ReadLine();
+                        string[] data = line.Split(',');
+                        try
+                        { 
+                            if (row > 1)
+                            {
+                                if (!string.IsNullOrEmpty(data[1]))
+                                {
+                                    sources.Add((data[1], data[2], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6])));    
+                                    destinations.Add((data[7], data[8], int.Parse(data[9]), int.Parse(data[10]), int.Parse(data[11]), int.Parse(data[12])));
+                                }
+                                                  
+                            }
+                        }
+                        catch (FormatException ex)
+                        {
+                            Console.WriteLine($"An error occurred: {ex.Message}");
+                        }
+
+                        
+                        row++;
+                    }
+
+                   
+                }
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine("Excel file not found");
+                }
+                catch (IOException)
+                {
+                    Console.WriteLine("An error occurred while reading or writing the excel file");
+                }
+            }
+
+            //Console.WriteLine("Data successfully imported to Excel.");
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("CSV file not found!");
+        }
+        catch (IOException)
+        {
+            Console.WriteLine("An error occurred while reading or writing the csv file!");
+        }
+
+        for (int i = 0; i < sources.Count; i++)
+        {
+            uploadOneSheet(sources[i],destinations[i]);
+        }
+    }
+    public void uploadOneSheet ((string, string, int, int, int, int) source, (string, string, int, int, int, int) destination)
+    {
+        try
+        {
+               
+
+            // Load the source workbook
+            using (ExcelPackage sourcePackage = new ExcelPackage(new FileInfo(source.Item1)))
+            {
+                sourcePackage.Workbook.CalcMode = ExcelCalcMode.Manual;
+                // Get the source worksheet
+                ExcelWorksheet sourceWorksheet = sourcePackage.Workbook.Worksheets[source.Item2];
+
+                // Load the destination workbook
+                using (ExcelPackage destinationPackage = new ExcelPackage(new FileInfo(destination.Item1)))
+                {
+                    destinationPackage.Workbook.CalcMode = ExcelCalcMode.Manual;
+                    // Get the destination worksheet
+                    ExcelWorksheet destinationWorksheet = destinationPackage.Workbook.Worksheets[destination.Item2];
+
+                    // Define the range to copy in the source worksheet
+                    ExcelRange sourceRange = sourceWorksheet.Cells[source.Item3,source.Item4,source.Item5,source.Item6];
+
+                    // Define the destination range in the destination worksheet
+                    ExcelRange destinationRange = destinationWorksheet.Cells[destination.Item3,destination.Item4,destination.Item5,destination.Item6];
+
+                    destinationWorksheet.Cells[destination.Item3-2,destination.Item4].Value = "Source";
+                    destinationWorksheet.Cells[destination.Item3-2,destination.Item4+1].Value = source.Item1;
+                    // Copy the values and formatting from the source range to the destination range
+                    destinationRange.Value = sourceRange.Value;
+                    //destinationRange.Style.Copy(sourceRange.Style);
+                    // Save the changes to the destination workbook
+                    sourcePackage.Workbook.CalcMode = ExcelCalcMode.Automatic;
+                    destinationPackage.Workbook.CalcMode = ExcelCalcMode.Automatic;
+                    destinationPackage.Save();
+                    sourcePackage.Save();
+            
+                }
+            Console.WriteLine($"{source.Item1} successfully imported to the {destination.Item1}");
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("CSV file not found!");
+        }
+        catch (IOException)
+        {
+            Console.WriteLine("An error occurred while reading or writing the excel files!");
+        }
+    
+    }
 }
 public class DeviceFolder
 
@@ -64,16 +280,32 @@ public class DeviceFolder
     public List<string> AllSubFolderPaths { get; set;} = new List<string>();
     public List<string> AllSubFolderNames { get; set;} = new List<string>();
     public List<bool> AllRev500Dones { get; set;} = new List<bool>();
+
+    public void processDeviceFolder()
+    {
+        if (!string.IsNullOrEmpty(FolderPath))
+        {
+            getAllSubFolderPaths();
+            getSampleID();
+            getAllSubFolderNames();
+            getAllSBDFolders();
+            getLogFilePath();
+            processAllSBDFolders();     
+            getAllRev500Dones(); 
+            getMemoFilePath();
+            memoWrite(); 
+        }  
+    }
     
     public void getAllSubFolderPaths()
     {
         if (!string.IsNullOrEmpty(FolderPath))
         {
-            string[] allPaths = Directory.GetDirectories(FolderPath, "*", SearchOption.AllDirectories);
+            string[] allPaths = Directory.GetDirectories(FolderPath, "*", SearchOption.TopDirectoryOnly);
             foreach (string subfolder in allPaths)
             {
                 AllSubFolderPaths.Add(subfolder);
-                Console.WriteLine($"Subfolder path: {subfolder}");
+                //Console.WriteLine($"Subfolder path: {subfolder}");
             }
         }
     }
@@ -95,7 +327,7 @@ public class DeviceFolder
         {
             for (int i = 0; i < AllSubFolderPaths.Count; i++)
             {
-                Console.WriteLine($"Folder Name: {AllSubFolderPaths[i].Substring(AllSubFolderPaths[i].Length-3)}");
+                //Console.WriteLine($"Folder Name: {AllSubFolderPaths[i].Substring(AllSubFolderPaths[i].Length-3)}");
                 AllSubFolderNames.Add(AllSubFolderPaths[i].Substring(AllSubFolderPaths[i].Length-3));
             }
         }
@@ -114,7 +346,7 @@ public class DeviceFolder
                 SBDFolder sbdFolder = new SBDFolder();
                 sbdFolder.FolderPath = AllSubFolderPaths[i];
                 AllSBDFolders.Add(sbdFolder);
-                Console.WriteLine($"Folder Name: {sbdFolder.FolderPath.Substring(AllSubFolderPaths[i].Length-3)}");
+                //Console.WriteLine($"Folder Name: {sbdFolder.FolderPath.Substring(AllSubFolderPaths[i].Length-3)}");
             }
         }
     }
@@ -128,6 +360,7 @@ public class DeviceFolder
         {
             for (int i = 0; i < AllSBDFolders.Count; i++)
             {
+                Console.WriteLine($"SBD Folder in process: {AllSubFolderNames[i]}");
                 AllSBDFolders[i].processSBDFolder();
                 LogMessage = $"Folder {AllSubFolderNames[i]} has been processed";
                 logWrite();
@@ -145,17 +378,22 @@ public class DeviceFolder
     }
     public void getAllRev500Dones()
     {
+        getAllSBDFolders();
         if (AllSBDFolders.Count == 0)
         {
             Console.WriteLine("AllSBDFolders list is empty");
         }
         else
         {
-            for (int i = 0; i < AllSBDFolders.Count; i++)
+            if (AllRev500Dones.Count == 0)
             {
-                AllSBDFolders[i].getRev500Done();
-                AllRev500Dones.Add(AllSBDFolders[i].Rev500Done);
+                for (int i = 0; i < AllSBDFolders.Count; i++)
+                {
+                    AllSBDFolders[i].getRev500Done();
+                    AllRev500Dones.Add(AllSBDFolders[i].Rev500Done);
+                }
             }
+            
         }
     }
 
@@ -176,7 +414,7 @@ public class DeviceFolder
             {
                 Memo = $"{AllSubFolderNames[i]},{AllRev500Dones[i]}";
                 File.AppendAllText(MemoFilePath, $"{Memo}\n");
-                Console.WriteLine(Memo);
+                //Console.WriteLine(Memo);
             }
             
         }
@@ -226,6 +464,12 @@ public class SBDFolder
     }
     public void getRev500Done()
     {
+        if (AllMeasTypes.Count == 0)
+        {     
+            if (AllCsvFileNames.Count == 0)
+                getAllCsvFileNames();
+            getAllMeasTypes();
+        }    
         if (AllMeasTypes.Contains("Pico Rev 500")) 
             Rev500Done = true; 
         else 
@@ -239,12 +483,12 @@ public class SBDFolder
     public void getSBDID()
     {
         SBDID = FolderPath.Substring(FolderPath.Length-3);
-        //Console.WriteLine(SBDID);
+        //Console.WriteLine($"Folder Path: {FolderPath}; SBDID: {SBDID}");
     }
     public void getSBDType()
     {
         SBDType = FolderPath.Substring(FolderPath.Length-3,1);
-        Console.WriteLine(SBDType);
+        //Console.WriteLine(SBDType);
     }
     public void getLogFilePath()
     {
@@ -287,12 +531,12 @@ public class SBDFolder
     public void getAllIsLasts()
     {   
         //List<int> lstIgnoredIndices = new List<int>();
-        Console.WriteLine($"Measurement number: {(AllMeasTypes.Count-1).ToString()}");
+        //Console.WriteLine($"Measurement number: {(AllMeasTypes.Count-1).ToString()}");
         for (int i=0; i < AllMeasTypes.Count; i++)
         {
             AllIsLasts.Add(true); 
         }
-        
+        Console.WriteLine($"AllMeasTypes.Count: {AllMeasTypes.Count}, AllMeasTimes.Count: {AllMeasTimes.Count}");
         for (int i=0; i < AllMeasTypes.Count; i++)
         {
             for (int j=i+1; j < AllMeasTypes.Count; j++)
@@ -314,7 +558,7 @@ public class SBDFolder
         }
         for (int i=0; i < AllMeasTypes.Count; i++)
         {
-            Console.WriteLine(AllIsLasts[i]);
+            Console.WriteLine($"MeasType: {AllMeasTypes[i]}, MeasTime: {AllMeasTimes[i]}, IsLast: {AllIsLasts[i]}");
         }
 
         
@@ -326,15 +570,21 @@ public class SBDFolder
         if (index != -1)
         {
             measType = csvFileName.Substring(0, index-1);
-            Console.WriteLine(measType);
+            //Console.WriteLine(measType);
         }
         else if (csvFileName.Contains("Stop3"))
         {
-            measType = "KL For";
+            if (csvFileName.Contains("Rev500"))
+                measType = "KL For After Rev500";
+            else
+                measType = "KL For";
         }
         else if (csvFileName.Contains("StopM3"))
         {
-            measType = "KL Rev";
+            if (csvFileName.Contains("Rev500"))
+                measType = "KL Rev After Rev500";
+            else
+                measType = "KL Rev";
         }
         else if (csvFileName.Contains("StopM500"))
         {
@@ -342,7 +592,7 @@ public class SBDFolder
         }
         else measType = "No Type";
 
-        Console.WriteLine(measType);
+        //Console.WriteLine(measType);
 
         return measType;
 
@@ -357,7 +607,7 @@ public class SBDFolder
         if ( indexCloseBracket!= -1)
         {
             strMeasTime = csvFileName.Substring(indexSemicolon+2,indexCloseBracket-indexSemicolon-2);
-            Console.WriteLine(strMeasTime);
+            //Console.WriteLine(strMeasTime);
         try 
         {
             
@@ -410,6 +660,25 @@ public class SBDFolder
     }
     public void createWorkbook()
     {
+        string templatePath = "../SBDExcelTemplates";  // Path to the template folder
+            
+        string[] templateFiles = Directory.GetFiles(templatePath);
+        foreach (string filePath in templateFiles)
+        {
+            if (SBDType == filePath.Substring(filePath.Length -8, 1))
+            {
+                templatePath = filePath;
+                //Console.WriteLine(templatePath);
+            }
+        }
+
+        // Copy the template to the folder
+        string workbookID = SampleID + "_" + SBDID + ".xlsx";
+        WorkbookPath = Path.Combine(FolderPath, workbookID);
+        //Console.WriteLine($"FolderPath: {FolderPath}; workbookID: {workbookID}");
+        File.Copy(templatePath, WorkbookPath, true);
+        //Workbook = new ExcelPackage(new FileInfo(WorkbookPath));
+        /*
         string[] files = Directory.GetFiles(FolderPath);
 
         foreach (string file in files)
@@ -441,10 +710,13 @@ public class SBDFolder
             // Copy the template to the folder
             string workbookID = SampleID + "_" + SBDID + ".xlsx";
             WorkbookPath = Path.Combine(FolderPath, workbookID);
+            //Console.WriteLine($"FolderPath: {FolderPath}; workbookID: {workbookID}");
             File.Copy(templatePath, WorkbookPath);
             //Workbook = new ExcelPackage(new FileInfo(WorkbookPath));
             
+            
         }
+        */
         
     }
     
