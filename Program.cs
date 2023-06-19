@@ -36,9 +36,9 @@ class Program
         comparisonFolder.TemplateFolderPath = @"../ComparisonExcelTemplates";
         comparisonFolder.FolderPath = @"../IrOxOASRecVsNonRec";
         comparisonFolder.SBDType = @"E";
-        comparisonFolder.createWorkbook(false);
+        comparisonFolder.createWorkbook(true);
         comparisonFolder.getAllDeviceFolders();
-        comparisonFolder.UploadMultipleSheets(@"../E_0500um.csv", 123, 130);
+        comparisonFolder.UploadMultipleSheets(@"../E_0500um.csv", 3, 130);
         //comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
         //                                 (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
         //Comparison stopped
@@ -277,7 +277,7 @@ public class ComparisonFolder
                         
                     };
                     */
-                    sourceRange.Copy(destinationRange);
+                    destinationRange.Value = sourceRange.Value;
                     //destinationRange.Style.Copy(sourceRange.Style);
                     // Save the changes to the destination workbook
                     sourcePackage.Workbook.CalcMode = ExcelCalcMode.Automatic;
