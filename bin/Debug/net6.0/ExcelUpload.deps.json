@@ -8,25 +8,25 @@
     ".NETCoreApp,Version=v6.0": {
       "ExcelUpload/1.0.0": {
         "dependencies": {
-          "EPPlus": "6.2.4"
+          "EPPlus": "6.2.6"
         },
         "runtime": {
           "ExcelUpload.dll": {}
         }
       },
-      "EPPlus/6.2.4": {
+      "EPPlus/6.2.6": {
         "dependencies": {
           "EPPlus.Interfaces": "6.1.1",
           "EPPlus.System.Drawing": "6.1.1",
           "Microsoft.Extensions.Configuration.Json": "6.0.0",
           "Microsoft.IO.RecyclableMemoryStream": "2.2.1",
-          "System.Security.Cryptography.Pkcs": "6.0.1",
+          "System.Security.Cryptography.Pkcs": "6.0.3",
           "System.Text.Encoding.CodePages": "6.0.0"
         },
         "runtime": {
           "lib/net6.0/EPPlus.dll": {
-            "assemblyVersion": "6.2.4.0",
-            "fileVersion": "6.2.4.0"
+            "assemblyVersion": "6.2.6.0",
+            "fileVersion": "6.2.6.0"
           }
         }
       },
@@ -197,14 +197,14 @@
       },
       "System.Formats.Asn1/6.0.0": {},
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
-      "System.Security.Cryptography.Pkcs/6.0.1": {
+      "System.Security.Cryptography.Pkcs/6.0.3": {
         "dependencies": {
           "System.Formats.Asn1": "6.0.0"
         },
         "runtime": {
           "lib/net6.0/System.Security.Cryptography.Pkcs.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.522.21309"
+            "fileVersion": "6.0.1823.26907"
           }
         },
         "runtimeTargets": {
@@ -212,7 +212,7 @@
             "rid": "win",
             "assetType": "runtime",
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.522.21309"
+            "fileVersion": "6.0.1823.26907"
           }
         }
       },
@@ -240,12 +240,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "EPPlus/6.2.4": {
+    "EPPlus/6.2.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-q61q8TeVqBRz+wGP0u/k0MJlpLM5YmkXhwUQxeSfaNBJD+RXvMhfioSq5b0HqTjc01h19Tt6vzHj0x5PfndOZQ==",
-      "path": "epplus/6.2.4",
-      "hashPath": "epplus.6.2.4.nupkg.sha512"
+      "sha512": "sha512-eAPQbEHPCsEh8pAICPP4YYhhBuUHq2HH6oLqHzfgUP+GynB7MFHL+Jjx1X7rZPD+iA3c12ilz/WygRylc+xriw==",
+      "path": "epplus/6.2.6",
+      "hashPath": "epplus.6.2.6.nupkg.sha512"
     },
     "EPPlus.Interfaces/6.1.1": {
       "type": "package",
@@ -352,12 +352,12 @@
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
-    "System.Security.Cryptography.Pkcs/6.0.1": {
+    "System.Security.Cryptography.Pkcs/6.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ynmbW2GjIGg9K1wXmVIRs4IlyDolf0JXNpzFQ8JCVgwM+myUC2JeUggl2PwQig2PNVMegKmN1aAx7WPQ8tI3vA==",
-      "path": "system.security.cryptography.pkcs/6.0.1",
-      "hashPath": "system.security.cryptography.pkcs.6.0.1.nupkg.sha512"
+      "sha512": "sha512-18UT1BdZ4TYFBHk/wuq7JzCdE3X75z81X+C2rXqIlmEnC21Pm60spGV/dKQSzbyomstqYE33EuN5hfnC86VFxA==",
+      "path": "system.security.cryptography.pkcs/6.0.3",
+      "hashPath": "system.security.cryptography.pkcs.6.0.3.nupkg.sha512"
     },
     "System.Text.Encoding.CodePages/6.0.0": {
       "type": "package",

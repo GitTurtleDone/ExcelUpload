@@ -3,6 +3,7 @@ using System.IO;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Globalization;
+using System.Threading;
 
 
 
@@ -25,7 +26,7 @@ class Program
 {
     static void Main()
     {
-        
+        //Comparison started
         ComparisonFolder comparisonFolder = new ComparisonFolder();
         //string[] comparisonFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
         //comparisonFolder.ComparedFolderPaths = comparisonFolderPaths;
@@ -35,9 +36,15 @@ class Program
         comparisonFolder.TemplateFolderPath = @"../ComparisonExcelTemplates";
         comparisonFolder.FolderPath = @"../IrOxOASRecVsNonRec";
         comparisonFolder.SBDType = @"E";
-        comparisonFolder.createWorkbook();
+        comparisonFolder.createWorkbook(false);
         comparisonFolder.getAllDeviceFolders();
-        //comparisonFolder.UploadMultipleSheets(@"../E_500um.csv");
+        comparisonFolder.UploadMultipleSheets(@"../E_0500um.csv", 123, 130);
+        //comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
+        //                                 (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
+        //Comparison stopped
+      
+        
+        
         /*
         comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
                                          (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
@@ -47,6 +54,8 @@ class Program
     
     
         /*
+        
+                                                                
         string csvFilePath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05" +
                             @"I_V Diode For Full After Rev500 wo PowComp [07 E5(4) ; 14_04_2023 4_49_12 p.m.].csv";
         MeasFile measFile = new MeasFile();
@@ -61,13 +70,18 @@ class Program
         measFile.analyzeFile();
         
         //string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/"};
-        string[] arrDevFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
+        //Upload to Device Folders started
+        string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
+                                      @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
+                                      @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
         for (int i = 0; i < arrDevFolderPaths.Length; i++)
         {
             DeviceFolder devFolder = new DeviceFolder();
             devFolder.FolderPath = arrDevFolderPaths[i];
             devFolder.processDeviceFolder();
         }
+        //Upload to Device Folders stopped
+        
         
 
         */
@@ -129,21 +143,24 @@ public class ComparisonFolder
             Console.WriteLine("Please assign all device folder paths");
         }
     }
-    public void createWorkbook()
+    public void createWorkbook(bool OverrideDestination)
     {    
-        string[] templateFiles = Directory.GetFiles(TemplateFolderPath);
-        foreach (string filePath in templateFiles)
+        if (OverrideDestination)
         {
-            if (SBDType == filePath.Substring(filePath.Length - 12, 1))
+            string[] templateFiles = Directory.GetFiles(TemplateFolderPath);
+            foreach (string filePath in templateFiles)
             {
-                // Copy the template to the folder
-                File.Copy(filePath, Path.Combine(FolderPath, Path.GetFileName(filePath)), true);
-                ComparedWorkbookPaths.Add(Path.Combine(FolderPath, Path.GetFileName(filePath)));
-                //Console.WriteLine(templatePath);
+                if (SBDType == filePath.Substring(filePath.Length - 13, 1))
+                {
+                    // Copy the template to the folder
+                    File.Copy(filePath, Path.Combine(FolderPath, Path.GetFileName(filePath)), true);
+                    ComparedWorkbookPaths.Add(Path.Combine(FolderPath, Path.GetFileName(filePath)));
+                    //Console.WriteLine(templatePath);
+                }
             }
         }
     }
-    public void UploadMultipleSheets(string ComparisonUploadDetailsTemplatePath)
+    public void UploadMultipleSheets(string ComparisonUploadDetailsTemplatePath, int startRow, int stopRow)
     {
     //
         //ExcelPackage compUploadDetPack = new ExcelPackage(new FileInfo(ComparisonUploadDetailsTemplatePath));
@@ -165,12 +182,15 @@ public class ComparisonFolder
                         string[] data = line.Split(',');
                         try
                         { 
-                            if (row > 1)
+                            if (row > 1) //((row >= 17) && (row < 18))
                             {
-                                if (!string.IsNullOrEmpty(data[1]))
+                                if ((row >= startRow -1) && (row <= stopRow -1))
                                 {
-                                    sources.Add((data[1], data[2], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6])));    
-                                    destinations.Add((data[7], data[8], int.Parse(data[9]), int.Parse(data[10]), int.Parse(data[11]), int.Parse(data[12])));
+                                    if (!string.IsNullOrEmpty(data[1]))
+                                    {
+                                        sources.Add((data[1], data[2], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6])));    
+                                        destinations.Add((data[7], data[8], int.Parse(data[9]), int.Parse(data[10]), int.Parse(data[11]), int.Parse(data[12])));
+                                    }
                                 }
                                                   
                             }
@@ -207,8 +227,10 @@ public class ComparisonFolder
             Console.WriteLine("An error occurred while reading or writing the csv file!");
         }
 
+        
         for (int i = 0; i < sources.Count; i++)
         {
+            Console.WriteLine($"Source: {sources[i]}, Destination: {destinations[i]}");
             uploadOneSheet(sources[i],destinations[i]);
         }
     }
@@ -233,23 +255,45 @@ public class ComparisonFolder
                     ExcelWorksheet destinationWorksheet = destinationPackage.Workbook.Worksheets[destination.Item2];
 
                     // Define the range to copy in the source worksheet
-                    ExcelRange sourceRange = sourceWorksheet.Cells[source.Item3,source.Item4,source.Item5,source.Item6];
+                    ExcelRangeBase sourceRange = sourceWorksheet.Cells[source.Item3,source.Item4,source.Item5,source.Item6];
 
                     // Define the destination range in the destination worksheet
-                    ExcelRange destinationRange = destinationWorksheet.Cells[destination.Item3,destination.Item4,destination.Item5,destination.Item6];
+                    ExcelRangeBase destinationRange = destinationWorksheet.Cells[destination.Item3,destination.Item4,destination.Item5,destination.Item6];
 
-                    destinationWorksheet.Cells[destination.Item3-2,destination.Item4].Value = "Source";
-                    destinationWorksheet.Cells[destination.Item3-2,destination.Item4+1].Value = source.Item1;
+                    if ((destinationWorksheet.Cells[destination.Item3-2,destination.Item4] == null || destinationWorksheet.Cells[destination.Item3-2,destination.Item4].Value == null || destinationWorksheet.Cells[destination.Item3-2,destination.Item4].Value is ExcelErrorValue))
+                        destinationWorksheet.Cells[destination.Item3-2,destination.Item4].Value = "Source";
+                    if ((destinationWorksheet.Cells[destination.Item3-1,destination.Item4] == null || destinationWorksheet.Cells[destination.Item3-1,destination.Item4].Value == null || destinationWorksheet.Cells[destination.Item3-1,destination.Item4].Value is ExcelErrorValue))
+                        destinationWorksheet.Cells[destination.Item3-1,destination.Item4].Value = source.Item1;
                     // Copy the values and formatting from the source range to the destination range
-                    destinationRange.Value = sourceRange.Value;
+                    /*
+                    for (int i = source.Item3; i <= source.Item5; i++)
+                    {
+                        for (int j = source.Item4; j <= source.Item6; j++)
+                        {
+                            destinationWorksheet.Cells[destination.Item3 + i-source.Item3, destination.Item4 + j-source.Item4].Value = sourceWorksheet.Cells[i, j].Value;
+                            
+                            //Console.WriteLine($"Destination: {destinationWorksheet.Cells[destination.Item3 + i-source.Item3, destination.Item4 + j-source.Item4].Value}; Source: {sourceWorksheet.Cells[i, j].Value}");
+                        }
+                        
+                    };
+                    */
+                    sourceRange.Copy(destinationRange);
                     //destinationRange.Style.Copy(sourceRange.Style);
                     // Save the changes to the destination workbook
                     sourcePackage.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     destinationPackage.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     destinationPackage.Save();
                     sourcePackage.Save();
+                    
+                    sourceRange.Dispose();
+                    destinationRange.Dispose();
+                    destinationWorksheet.Dispose();
+                    sourceWorksheet.Dispose();
+                    destinationPackage.Dispose();
             
                 }
+            sourcePackage.Dispose();
+            //Thread.Sleep(5000);
             Console.WriteLine($"{source.Item1} successfully imported to the {destination.Item1}");
             }
         }
@@ -293,7 +337,7 @@ public class DeviceFolder
             processAllSBDFolders();     
             getAllRev500Dones(); 
             getMemoFilePath();
-            memoWrite(); 
+            //memoWrite(); 
         }  
     }
     
@@ -846,6 +890,7 @@ public class SBDFolder
                         LogMessage = $"Data file: {Path.GetFileName(fCsvFilePath)} has been successfully imported to the sheet: {fSheetName} in {Path.GetFileName(fExcelFilePath)}";
                         package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                         package.Save();
+                        package.Dispose();
                     }
                 }
                 catch (FileNotFoundException)
