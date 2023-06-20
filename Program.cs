@@ -26,6 +26,31 @@ class Program
 {
     static void Main()
     {
+        
+        
+       
+        /*
+        comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
+                                         (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
+        */
+        
+         // Process SBDFolder starts
+        SBDFolder SBDFolder = new SBDFolder();
+        SBDFolder.FolderPath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05";
+        SBDFolder.SBDTemplateFolderPath = @"../SBDExcelTemplates";
+        SBDFolder.getAllCsvFileNames();
+        SBDFolder.processSBDFolder();
+        // Process SBDFolder stops
+    
+    
+        /*
+        
+                                                                
+        string csvFilePath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05" +
+                            @"I_V Diode For Full After Rev500 wo PowComp [07 E5(4) ; 14_04_2023 4_49_12 p.m.].csv";
+        MeasFile measFile = new MeasFile();
+        
+
         //Comparison started
         ComparisonFolder comparisonFolder = new ComparisonFolder();
         //string[] comparisonFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
@@ -42,34 +67,13 @@ class Program
         //comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
         //                                 (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
         //Comparison stopped
-      
-        
-        
-        /*
-        comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
-                                         (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
-        */
-        
-        
-    
-    
-        /*
-        
-                                                                
-        string csvFilePath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05" +
-                            @"I_V Diode For Full After Rev500 wo PowComp [07 E5(4) ; 14_04_2023 4_49_12 p.m.].csv";
-        MeasFile measFile = new MeasFile();
-
-        SBDFolder SBDFolder = new SBDFolder();
-        SBDFolder.FolderPath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/F03";
-        SBDFolder.getAllCsvFileNames();
-        SBDFolder.processSBDFolder();
         
         //DeviceFolder devFolder = new DeviceFolder();     
         measFile.CsvFilePath = csvFilePath;
         measFile.analyzeFile();
         
         //string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/"};
+       
         //Upload to Device Folders started
         string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
                                       @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
@@ -80,7 +84,9 @@ class Program
             devFolder.FolderPath = arrDevFolderPaths[i];
             devFolder.processDeviceFolder();
         }
+        
         //Upload to Device Folders stopped
+
         
         
 
@@ -117,9 +123,9 @@ public class ComparisonFolder
                 {
                     DeviceFolder deviceFolder = new DeviceFolder();
                     deviceFolder.FolderPath = ComparedFolderPaths[i];
-                    deviceFolder.getAllSubFolderPaths();
-                    deviceFolder.getAllSubFolderNames();
-                    deviceFolder.getAllRev500Dones();
+                    if (deviceFolder.AllSubFolderPaths.Count == 0) deviceFolder.getAllSubFolderPaths();
+                    if (deviceFolder.AllSubFolderNames.Count == 0) deviceFolder.getAllSubFolderNames();
+                    if (deviceFolder.AllRev500Dones.Count == 0) deviceFolder.getAllRev500Dones();
                     Console.WriteLine ($"{ComparedFolderPaths[i]} has {deviceFolder.AllRev500Dones.Count} subfolders ");
                     DeviceFolders.Add(deviceFolder);
                 }
@@ -143,7 +149,7 @@ public class ComparisonFolder
             Console.WriteLine("Please assign all device folder paths");
         }
     }
-    public void createWorkbook(bool OverrideDestination)
+    public void createWorkbook(bool OverrideDestination = true)
     {    
         if (OverrideDestination)
         {
@@ -325,19 +331,25 @@ public class DeviceFolder
     public List<string> AllSubFolderNames { get; set;} = new List<string>();
     public List<bool> AllRev500Dones { get; set;} = new List<bool>();
 
-    public void processDeviceFolder()
+    public void processDeviceFolder(string fUploadDetailTemplatePath = "../UploadDetailsTemplate.csv", 
+                                    string fSBDTemplateFolderPath = "../SBDExcelTemplates", bool OverrideDestination = true)
     {
         if (!string.IsNullOrEmpty(FolderPath))
         {
             getAllSubFolderPaths();
+            //Console.WriteLine($"After getAllSubFolderPaths AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
             getSampleID();
             getAllSubFolderNames();
+            //Console.WriteLine($"After getAllSubFolderNames AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
             getAllSBDFolders();
+            //Console.WriteLine($"After getAllSBDFolders AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
             getLogFilePath();
-            processAllSBDFolders();     
             getAllRev500Dones(); 
+            //Console.WriteLine($"After getAllRev500Dones AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
             getMemoFilePath();
-            //memoWrite(); 
+            memoWrite(); 
+            processAllSBDFolders(fUploadDetailTemplatePath, fSBDTemplateFolderPath, OverrideDestination);     
+            
         }  
     }
     
@@ -394,7 +406,9 @@ public class DeviceFolder
             }
         }
     }
-    public void processAllSBDFolders()
+    public void processAllSBDFolders(string fUploadDetailTemplatePath = "../UploadDetailsTemplate.csv",  
+                                     string fSBDTemplateFolderPath = "../SBDExcelTemplates",
+                                     bool OverrideDestination = true) 
     {
         if (AllSBDFolders.Count == 0)
         {
@@ -405,7 +419,7 @@ public class DeviceFolder
             for (int i = 0; i < AllSBDFolders.Count; i++)
             {
                 Console.WriteLine($"SBD Folder in process: {AllSubFolderNames[i]}");
-                AllSBDFolders[i].processSBDFolder();
+                AllSBDFolders[i].processSBDFolder(fUploadDetailTemplatePath, fSBDTemplateFolderPath, OverrideDestination);
                 LogMessage = $"Folder {AllSubFolderNames[i]} has been processed";
                 logWrite();
             }
@@ -422,7 +436,8 @@ public class DeviceFolder
     }
     public void getAllRev500Dones()
     {
-        getAllSBDFolders();
+        //Console.WriteLine($"before getRev500Dones starts AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
+        //getAllSBDFolders();
         if (AllSBDFolders.Count == 0)
         {
             Console.WriteLine("AllSBDFolders list is empty");
@@ -435,10 +450,12 @@ public class DeviceFolder
                 {
                     AllSBDFolders[i].getRev500Done();
                     AllRev500Dones.Add(AllSBDFolders[i].Rev500Done);
+                    //Console.WriteLine($"{i}: {AllRev500Dones.Count}");
                 }
             }
             
         }
+        //Console.WriteLine($"after getAllRev500Dones finishes AllSubfolderNames.Count: {AllSubFolderNames.Count}, AllRevDones.Count {AllRev500Dones.Count}");
     }
 
     public void getMemoFilePath()
@@ -448,6 +465,7 @@ public class DeviceFolder
 
     public void memoWrite()
     {
+        if (File.Exists(MemoFilePath)) File.Delete(MemoFilePath);
         if (AllRev500Dones.Count == 0) 
         {
             Console.WriteLine("AllRev500Dones list is empty");
@@ -456,7 +474,7 @@ public class DeviceFolder
         {
             for (int i = 0; i < AllRev500Dones.Count; i++)
             {
-                Memo = $"{AllSubFolderNames[i]},{AllRev500Dones[i]}";
+                Memo = $"{DateTime.Now}: {AllSubFolderNames[i]},{AllRev500Dones[i]}";
                 File.AppendAllText(MemoFilePath, $"{Memo}\n");
                 //Console.WriteLine(Memo);
             }
@@ -478,6 +496,7 @@ public class SBDFolder
     public string SBDType { get; set;}
     public string[] AllFilePaths { get; set;}
     public bool Rev500Done {get; set;}
+    public string SBDTemplateFolderPath {get; set;}
     public List<string> AllCsvFileNames { get; set;} = new List<string>();
     public List<string> AllCsvFilePaths { get; set;} = new List<string>();
     public List<string> AllMeasTypes { get; set;} = new List<string>();
@@ -487,19 +506,22 @@ public class SBDFolder
     public List<(string, string, int, int)> UploadDetailTemplates { get; set;} = new List<(string, string, int, int)>();
     //public ExcelPackage Workbook;
     
-    public void processSBDFolder()
+    public void processSBDFolder(string fUploadDetailTemplatePath ="../UploadDetailsTemplate.csv",
+                                 string fSBDTemplateFolderPath = "../SBDExcelTemplates",
+                                 bool OverrideDestination = true)
     {
         if (!string.IsNullOrEmpty(FolderPath))
         {
-            UploadDetailTemplatePath = "../UploadDetailsTemplate.csv";
-            getAllCsvFileNames();
-            getAllMeasTimes();
-            getAllMeasTypes();
-            getAllIsLasts();
+            UploadDetailTemplatePath = fUploadDetailTemplatePath;
+            SBDTemplateFolderPath = fSBDTemplateFolderPath;
+            if (AllCsvFileNames.Count == 0) getAllCsvFileNames();
+            if (AllMeasTimes.Count == 0) getAllMeasTimes();
+            if (AllMeasTypes.Count == 0) getAllMeasTypes();
+            if (AllIsLasts.Count == 0) getAllIsLasts();
             getSBDID();
             getSBDType();
             getSamplID();
-            createWorkbook();
+            createWorkbook(OverrideDestination);
             getUploadDetailTemplate();
             getLogFilePath();
             getRev500Done();
@@ -702,39 +724,38 @@ public class SBDFolder
         }
         return measTime;    
     }
-    public void createWorkbook()
+    public void createWorkbook(bool OverrideDestination = true)
     {
-        string templatePath = "../SBDExcelTemplates";  // Path to the template folder
-            
-        string[] templateFiles = Directory.GetFiles(templatePath);
-        foreach (string filePath in templateFiles)
-        {
-            if (SBDType == filePath.Substring(filePath.Length -8, 1))
-            {
-                templatePath = filePath;
-                //Console.WriteLine(templatePath);
-            }
-        }
-
-        // Copy the template to the folder
         string workbookID = SampleID + "_" + SBDID + ".xlsx";
-        WorkbookPath = Path.Combine(FolderPath, workbookID);
+        WorkbookPath = Path.Combine(FolderPath, workbookID);   
+        
+        if (OverrideDestination)
+        {
+            if (File.Exists(WorkbookPath)) 
+            {
+                Console.WriteLine("Workbook sussesfully deleted");
+                File.Delete(WorkbookPath);
+            }    
+            string[] templateFiles = Directory.GetFiles(SBDTemplateFolderPath);
+            foreach (string filePath in templateFiles)
+            {
+                if (SBDType == filePath.Substring(filePath.Length -8, 1))
+                {
+                    File.Copy(filePath, WorkbookPath, true);
+                    Console.WriteLine($"Copy Template successfull to: {WorkbookPath} ");
+                    break;
+                    
+                }
+            }
+            
+        }
+        // Copy the template to the folder
+        
         //Console.WriteLine($"FolderPath: {FolderPath}; workbookID: {workbookID}");
-        File.Copy(templatePath, WorkbookPath, true);
+        
         //Workbook = new ExcelPackage(new FileInfo(WorkbookPath));
         /*
-        string[] files = Directory.GetFiles(FolderPath);
-
-        foreach (string file in files)
-        {
-            string extension = Path.GetExtension(file);
-
-            if (extension == ".xlsx" || extension == ".xls")
-            {
-                WorkbookPath = file;
-                break;
-            }
-        }
+       
 
         if (WorkbookPath == null)
         {
@@ -890,6 +911,7 @@ public class SBDFolder
                         LogMessage = $"Data file: {Path.GetFileName(fCsvFilePath)} has been successfully imported to the sheet: {fSheetName} in {Path.GetFileName(fExcelFilePath)}";
                         package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                         package.Save();
+                        worksheet.Dispose();
                         package.Dispose();
                     }
                 }
@@ -901,8 +923,9 @@ public class SBDFolder
                 {
                     Console.WriteLine("An error occurred while reading or writing the excel file");
                 }
+            reader.Dispose();
             }
-
+            
             Console.WriteLine("Data successfully imported to Excel.");
         }
         catch (FileNotFoundException)
@@ -912,6 +935,10 @@ public class SBDFolder
         catch (IOException)
         {
             Console.WriteLine("An error occurred while reading or writing the csv file!");
+        }
+        catch (InvalidDataException ex)
+        {
+            Console.WriteLine($"File in Use: {ex.Message}");
         }
     
     }
