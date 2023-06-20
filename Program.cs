@@ -26,7 +26,18 @@ class Program
 {
     static void Main()
     {
+        //Upload to Device Folders started
+        string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
+                                      @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
+                                      @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
+        for (int i = 0; i < arrDevFolderPaths.Length; i++)
+        {
+            DeviceFolder devFolder = new DeviceFolder();
+            devFolder.FolderPath = arrDevFolderPaths[i];
+            devFolder.processDeviceFolder();
+        }
         
+        //Upload to Device Folders stopped
         
        
         /*
@@ -34,18 +45,19 @@ class Program
                                          (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
         */
         
-         // Process SBDFolder starts
+         
+    
+    
+        /*
+        
+        // Process SBDFolder starts
         SBDFolder SBDFolder = new SBDFolder();
         SBDFolder.FolderPath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05";
         SBDFolder.SBDTemplateFolderPath = @"../SBDExcelTemplates";
         SBDFolder.getAllCsvFileNames();
         SBDFolder.processSBDFolder();
         // Process SBDFolder stops
-    
-    
-        /*
-        
-                                                                
+
         string csvFilePath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05" +
                             @"I_V Diode For Full After Rev500 wo PowComp [07 E5(4) ; 14_04_2023 4_49_12 p.m.].csv";
         MeasFile measFile = new MeasFile();
@@ -74,18 +86,7 @@ class Program
         
         //string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/"};
        
-        //Upload to Device Folders started
-        string[] arrDevFolderPaths = {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
-                                      @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
-                                      @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
-        for (int i = 0; i < arrDevFolderPaths.Length; i++)
-        {
-            DeviceFolder devFolder = new DeviceFolder();
-            devFolder.FolderPath = arrDevFolderPaths[i];
-            devFolder.processDeviceFolder();
-        }
         
-        //Upload to Device Folders stopped
 
         
         
