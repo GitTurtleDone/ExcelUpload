@@ -1,29 +1,34 @@
 import logo from "./logo.svg";
 import "./App.css";
+import React, { useRef, useState } from "react";
 
 function App() {
+  const inputRef = useRef(null);
+  const [folderPath, setFolderPath] = useState(""); // Path to the interested folder
+  const handleButtonClick = () => {
+    inputRef.current.click();
+  };
+  const handleFileSelect = (e) => {
+    const selectedFile = e.target.files[0];
+    console.log("Selected File: ", selectedFile);
+    const filePath = selectedFile
+      ? selectedFile.webkitRelativePaht || selectedFile.name
+      : "";
+    setFolderPath(filePath);
+  };
   return (
     <div className="App">
-      {/* {
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <title>Excel Upload</title>
-        </header>
-      } */}
-      <label>Path</label>
-      <input type="text" />
-      <button>Browse</button>
+      <label>Path: </label>
+      <input type="text" value={folderPath} onChange={handleFileSelect} />
+      <button onClick={handleButtonClick}>Browse</button>
+      <input
+        type="file"
+        style={{ display: "none" }}
+        ref={inputRef}
+        onChange={handleFileSelect}
+        directory="true"
+        webkitdirectory="true"
+      />
     </div>
   );
 }
