@@ -36,74 +36,70 @@ class Program
        // MeasFile Stops */
 
         
-        /* // Process SBDFolder starts
-        SBDFolder SBDFolder = new SBDFolder();
-        SBDFolder.FolderPath = @"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/B12"; 
-        SBDFolder.SBDTemplateFolderPath = @"../SBDExcelTemplates";
-        SBDFolder.getAllCsvFileNames();
-        SBDFolder.processSBDFolder();
-        // Process SBDFolder stops  */
-
-
+        /*
+        // Process SBDFolders starts
         
+        string[] arrSBDFolderPaths = {//@"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05/F01",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05/F02",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05/F03",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/E03", 
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/E04",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/E05",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/E07"}; 
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/E08",
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/F01", 
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/F02", 
+                                      //@"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09/F03",    
+                                      @"../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecessSOA/Dev13/F03"};
+                                       // ../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecessSOA/Dev13/F03/IrOxNonRecesSOA_Dev13_F03.xlsx
+                                       //                                                                                IrOxNonRecessSOA_Dev13_F03
+        for (int i = 0; i < arrSBDFolderPaths.Length; i++)
+        {
+            SBDFolder sbdFolder = new SBDFolder();
+            sbdFolder.FolderPath = arrSBDFolderPaths[i]; 
+            sbdFolder.SBDTemplateFolderPath = @"../SBDExcelTemplates";
+            sbdFolder.getAllCsvFileNames();
+            sbdFolder.processSBDFolder();
+        }
+        
+        // Process SBDFolders stops 
+        */
+        
+
+
+        /*
          //Upload to Device Folders started
-        string[] arrDevFolderPaths = {//@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07"};
-                                      @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
-                                      @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
+        string[] arrDevFolderPaths = {@"../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecesSOA/Dev13",
+                                      @"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09", 
+                                      @"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05"};
         for (int i = 0; i < arrDevFolderPaths.Length; i++)
         {
             DeviceFolder devFolder = new DeviceFolder();
             devFolder.FolderPath = arrDevFolderPaths[i];
             devFolder.processDeviceFolder();
         }
-        //Upload to Device Folders stopped 
+        //Upload to Device Folders stopped
+        */
        
 
     
         
-
+        
         //Comparison started
         ComparisonFolder comparisonFolder = new ComparisonFolder();
         //string[] comparisonFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
         //comparisonFolder.ComparedFolderPaths = comparisonFolderPaths;
-        comparisonFolder.ComparedFolderPaths = new string[] {@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07",
-                                                                @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01", 
-                                                                    @"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02"};
+        comparisonFolder.ComparedFolderPaths = new string[] {@"../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecesSOA/Dev13",
+                                                                @"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09", 
+                                                                    @"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05"};
         comparisonFolder.TemplateFolderPath = @"../ComparisonExcelTemplates";
-        comparisonFolder.FolderPath = @"../IrOxOASRecVsNonRec";
-        comparisonFolder.SBDTypes = new string[] {"A", "B", "C", "D", "E", "F"};
+        comparisonFolder.FolderPath = @"../230626_IrOxRecessVsNonrecessSOA";
+        comparisonFolder.SBDTypes = new string[] {"F"};
         comparisonFolder.ProcessComparisonFolder(true, 3, 130);
         //comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
         //                                 (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
         //Comparison stopped
-       
-        
-       
-       
-        
-        
-        
-        
-        
-        
-        
-
-        
-
-        
-        
-        
-        
-       
-        
-
-        
-        
-
-        
-        
-        
-          
+             
     }
 
 }
@@ -342,7 +338,7 @@ public class ComparisonFolder
                     //destinationWorkbook.CalcMode = ExcelCalcMode.Automatic;
                     destinationPackage.Save();
                     sourcePackage.Save();
-                    Thread.Sleep(5000);
+                    //Thread.Sleep(5000);
                     
                     sourceRange.Dispose();
                     destinationRange.Dispose();
@@ -350,10 +346,8 @@ public class ComparisonFolder
                     destinationWorksheet.Dispose();
                     sourceWorkbook.Dispose();
                     destinationWorkbook.Dispose();
-                    destinationPackage.Dispose();
-            
                 }
-            sourcePackage.Dispose();
+            //sourcePackage.Dispose();
             //Thread.Sleep(5000);
             Console.WriteLine($"{source.Item1} successfully imported to the {destination.Item1}");
             }
@@ -695,14 +689,14 @@ public class SBDFolder
         }
         else if (csvFileName.Contains("Stop3"))
         {
-            if (csvFileName.Contains("Rev500"))
+            if (csvFileName.Contains("Sweep8"))
                 measType = "KL For After Rev500";
             else
                 measType = "KL For";
         }
         else if (csvFileName.Contains("StopM3"))
         {
-            if (csvFileName.Contains("Rev500"))
+            if (csvFileName.Contains("Sweep9"))
                 measType = "KL Rev After Rev500";
             else
                 measType = "KL Rev";
@@ -975,9 +969,9 @@ public class SBDFolder
                         LogMessage = $"Data file: {Path.GetFileName(fCsvFilePath)} has been successfully imported to the sheet: {fSheetName} in {Path.GetFileName(fExcelFilePath)}";
                         package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                         package.Save();
-                        Thread.Sleep(5000);
-                        worksheet.Dispose();
-                        package.Dispose();
+                        //Thread.Sleep(5000);
+                        //worksheet.Dispose();
+                        //package.Dispose();
                     }
                 }
                 catch (FileNotFoundException)
@@ -988,7 +982,7 @@ public class SBDFolder
                 {
                     Console.WriteLine("An error occurred while reading or writing the excel file");
                 }
-            reader.Dispose();
+            //reader.Dispose();
             }
             
             Console.WriteLine("Data successfully imported to Excel.");
