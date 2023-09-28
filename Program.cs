@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Globalization;
 using System.Threading;
+using Microsoft.Win32;
 
 
 
@@ -69,9 +70,8 @@ class Program
 
         /*
          //Upload to Device Folders started
-        string[] arrDevFolderPaths = {@"../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecesSOA/Dev13",
-                                      @"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09", 
-                                      @"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05"};
+        string[] arrDevFolderPaths = {@"../230925_Fab230904_GentleEtch/Dev11",
+                                      @"../230925_Fab230904_GentleEtch/Dev13"};
         for (int i = 0; i < arrDevFolderPaths.Length; i++)
         {
             DeviceFolder devFolder = new DeviceFolder();
@@ -79,26 +79,30 @@ class Program
             devFolder.processDeviceFolder();
         }
         //Upload to Device Folders stopped
+        
         */
-       
 
     
-        
-        
+        //OpenFileDialog openFileDialog = new OpenFileDialog();
+        /**/
         //Comparison started
         ComparisonFolder comparisonFolder = new ComparisonFolder();
         //string[] comparisonFolderPaths = {@"../230512_Fab230504to0607/230606_Fab230509IrOxRecess/Dev02/", @"../230512_Fab230504to0607/230609_Fab230509IrOxNonRecess/Dev01/"};
         //comparisonFolder.ComparedFolderPaths = comparisonFolderPaths;
-        comparisonFolder.ComparedFolderPaths = new string[] {@"../230626_IrOxRecessVsNonrecessSOA/230417_Fab230215_IrOxNonRecesSOA/Dev13",
-                                                                @"../230626_IrOxRecessVsNonrecessSOA/230612_Fab230602_IrOxRecessSOA/Dev09", 
-                                                                    @"../230626_IrOxRecessVsNonrecessSOA/230628_Fab230602_IrOxNonRecessSOA/Dev05"};
-        comparisonFolder.TemplateFolderPath = @"../ComparisonExcelTemplates";
-        comparisonFolder.FolderPath = @"../230626_IrOxRecessVsNonrecessSOA";
-        comparisonFolder.SBDTypes = new string[] {"F"};
-        comparisonFolder.ProcessComparisonFolder(true, 3, 130);
+        comparisonFolder.ComparedFolderPaths = new string[] {@"../230907_Fab230904/Dev13",
+                                                                @"../230907_Fab230904/Dev11", 
+                                                                    @"../230925_Fab230904_GentleEtch/Dev13",
+                                                                        @"230925_Fab230904_GentleEtch/Dev11"};
+        comparisonFolder.TemplateFolderPath = @"../230925_Fab230904_GentleEtch/ComparisonExcelTemplates";
+        comparisonFolder.FolderPath = @"../230925_Fab230904_GentleEtch";
+        comparisonFolder.SBDTypes = new string[] {"B", "D", "E", "F"};
+        comparisonFolder.ComparisonUploadDetailFolderPath = @"../230925_Fab230904_GentleEtch/ComparisonUploadDetailTemplates";//
+        comparisonFolder.ProcessComparisonFolder(true, 3, 38);
         //comparisonFolder.uploadOneSheet((@"../230216_Fab230215/230414_Fab230215IrOxNonRecess/Dev07/E05/Fab230215IrOxNonRecess_Dev07_E05.xlsx", @"Rev500", 3, 1, 509,3),
         //                                 (@"../IrOxOASRecVsNonRec/E_500um.xlsx", @"Rev500I", 3,1,509,3));
         //Comparison stopped
+        
+
              
     }
 
@@ -110,6 +114,8 @@ public class ComparisonFolder
     public string[] ComparedFolderPaths { get; set;}
     public string TemplateFolderPath {get; set;}
     public string TemplatePath {get; set;}
+    public string ComparisonUploadDetailFolderPath {get; set;}
+    
     public string[] SBDTypes {get; set;}
     
     public List<string> ComparedWorkbookPaths {get; set;} = new List<string>();
@@ -204,7 +210,7 @@ public class ComparisonFolder
         {
             foreach (string comparedWorkbookPath in ComparedWorkbookPaths)
             {
-                ComparisonUploadDetailPaths.Add(Path.Combine(@"../" + Path.GetFileNameWithoutExtension(comparedWorkbookPath) + ".csv"));
+                ComparisonUploadDetailPaths.Add(Path.Combine(ComparisonUploadDetailFolderPath + @"/" + Path.GetFileNameWithoutExtension(comparedWorkbookPath) + ".csv"));
                 Console.WriteLine(Path.GetFileNameWithoutExtension(comparedWorkbookPath) + ".csv");
             }
             
